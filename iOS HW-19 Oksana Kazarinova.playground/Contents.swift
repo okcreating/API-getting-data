@@ -1,5 +1,7 @@
 import Foundation
 
+// MARK: URL Creation
+
 enum Paths: String {
     case dataForToday = "/intensity/date"
     case dataForSpecificDate = "/intensity/date/2023-08-12"
@@ -14,8 +16,7 @@ func createURL(path: Paths) -> URL? {
     return components.url
 }
 
-createURL(path: .dataForToday)
-createURL(path: .dataForSpecificDate)
+// MARK: URL Request
 
 func createRequest(url: URL?) -> URLRequest? {
     guard let url else { return nil }
@@ -24,6 +25,8 @@ func createRequest(url: URL?) -> URLRequest? {
     return request
 }
 
+// MARK: Session Configuration
+
 func sessionConfiguration() -> URLSession {
     let configuration = URLSessionConfiguration.default
     configuration.allowsCellularAccess = false
@@ -31,12 +34,18 @@ func sessionConfiguration() -> URLSession {
     return URLSession(configuration: configuration)
 }
 
-func getData(urlRequest: String) {
-    let urlRequest = createRequest(url: createURL(path: .dataForSpecificDate))
-    guard let url = urlRequest else { return }
-    sessionConfiguration().dataTask(with: url) { data, response, error in
-        if error != nil {
+// MARK: Fetching Data
 
+func getData() {
+    guard let url = createURL(path: .dataForSpecificDate),
+    //guard let url = createURL(path: .dataForToday),
+   // guard let url = createURL(path: .wrongURL),
+    let urlRequest = createRequest(url: url) else { return }
+    let session = sessionConfiguration()
+    session.dataTask(with: urlRequest) { data, response, error in
+        if error != nil {
+            print("Error is not nil")
+        } else {
         let response = response as? HTTPURLResponse
             switch response?.statusCode {
             case 200:
@@ -48,12 +57,11 @@ func getData(urlRequest: String) {
             default:
                 print("Sorry, you faced with unknown error.")
             }
-            guard let data = data else { return }
-            let dataAsString = String(data: data, encoding: .utf8)
-            print("\(String(describing: dataAsString))")
+        guard let data = data else { return }
+        let dataAsString = String(data: data, encoding: .utf8)
+        print("\(String(describing: dataAsString))")
         }
     }.resume()
 }
-// 79eaebd384b9c4dc6d5b8498c70de65f public
-// 56d8367e02b0b31038ed8293b79bd42c71cbe0e7 private
 
+getData()
