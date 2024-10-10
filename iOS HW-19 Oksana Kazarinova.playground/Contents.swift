@@ -21,7 +21,6 @@ func createURL(path: Paths) -> URL? {
 func createRequest(url: URL?) -> URLRequest? {
     guard let url else { return nil }
     var request = URLRequest(url: url)
-    request.httpMethod = "GET"
     return request
 }
 
